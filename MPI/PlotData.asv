@@ -1,0 +1,51 @@
+fileNames = {
+    'Quad_MPI_Ibsend_0.txt'
+    'Quad_MPI_Ibsend_1.txt'
+    'Quad_MPI_Ibsend_2.txt'
+    'Quad_MPI_Ibsend_3.txt'
+    'Quad_MPI_Ibsend_4.txt'
+    'Quad_MPI_Ibsend_5.txt'
+};
+data = {};
+for fileID = 1:length(fileNames)
+    fileArr = fileNames(fileID);
+    file = fileArr{1,1};
+    fileData = readtable(file);
+    data{fileID} = fileData;
+end
+dataSize = height(data{1});
+hf = figure ();
+hold on 
+for d = 1 : length(data)
+    for counter = 1 : dataSize
+        Ys(counter) = data{d}{counter, 2};
+        Xs(counter) = data{d}{counter, 1};
+    end
+    plot(Xs, Ys) 
+end
+legend(legendL,'Location','southwest')
+%set(gca, 'YScale', 'log') 
+%axis ([2,max_k, 0, max_time]);
+title ("DEBUG");
+
+for counter = 1 : dataSize
+    Ys(counter) = data{1}{counter, 2};
+    x = 0;
+    for d = 1 : length(data)
+        x = x + data{d}{counter, 1};
+    end
+    Xs(counter) = x / length(data);
+end
+hold off
+hf = figure ();
+
+hold on 
+plot(Xs, Ys) 
+OutM(:, 1) = Xs;
+OutM(:, 2) = Ys;
+writematrix(OutM,'M.csv');
+%set(gca, 'YScale', 'log') 
+%axis ([2,max_k, 0, max_time]);
+xlabel ("Rozmiar komunikatu [B]");
+ylabel ("Przepustowość [Mbit/s]");
+title ("Przepustowość dla różnych roamiarów komunikatów");

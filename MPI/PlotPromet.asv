@@ -1,0 +1,166 @@
+Files_Small = {
+    'data/test_100000000_0.txt'
+    'data/test_100000000_00.txt'
+    'data/test_100000000_1.txt'
+    'data/test_100000000_2.txt'
+    'data/test_100000000_3.txt'
+    'data/7-test-100000000.txt'
+    'data/8-test-100000000.txt'
+    'data/9-test-100000000.txt'
+    'data/11-test-100000000.txt'
+    'data/15-test-100000000.txt'
+};
+Files_Med = {
+    'data/test_10000000000_0.txt'
+    'data/test_10000000000_00.txt'
+    'data/test_10000000000_1.txt'
+    'data/test_10000000000_2.txt'
+    'data/test_10000000000_3.txt'
+    'data/7-test-10000000000.txt'
+    'data/8-test-10000000000.txt'
+    'data/9-test-10000000000.txt'
+    'data/11-test-10000000000.txt'
+    'data/15-test-10000000000.txt'
+};
+
+Files_Big = {
+    'data/test_20000000000_0.txt'
+    'data/test_20000000000_00.txt'
+    'data/test_20000000000_1.txt'
+    'data/test_20000000000_2.txt'
+    'data/test_20000000000_3.txt'
+    'data/7-test-20000000000.txt'
+    'data/8-test-20000000000.txt'
+    'data/9-test-20000000000.txt'
+    'data/11-test-20000000000.txt'
+    'data/15-test-20000000000.txt'
+};
+
+
+Files_Small_M = CombineResults(Files_Small, true);
+Files_Med_M = CombineResults(Files_Med, true);
+Files_Big_M = CombineResults(Files_Big, true);
+
+hf = figure ();
+threadsXs = Files_Small_M(:,1);
+smallTimeYs = Files_Small_M(:,2);
+medTimeYs = Files_Med_M(:,2);
+bigTimeYs = Files_Big_M(:,2);
+
+smallProblemTime = Files_Small_M(1,2);
+for i = 1:length(Files_Small_M(:,1))
+    smallIdealYs(i) = smallProblemTime / Files_Small_M(i,1);
+end
+
+
+
+hf = figure ();
+hold on 
+scatter(threadsXs, smallTimeYs, 'filled') 
+scatter(threadsXs, smallIdealYs,50,'X', 'LineWidth',1);
+xlabel ("Liczba wątków");
+ylabel ("Czas wykonania zadania [s]");
+title ("Czas wykonania małego zadania");
+legend({'Mały problem', 'Idealny przebieg'},'Location','southwest')
+hold off
+
+medProblemTime = Files_Med_M(1,2);
+for i = 1:length(Files_Med_M(:,1))
+    medIdealYs(i) = medProblemTime / Files_Med_M(i,1);
+end
+
+hf = figure ();
+hold on 
+scatter(threadsXs, medTimeYs, 'filled') 
+scatter(threadsXs, medIdealYs,50,'X', 'LineWidth',1);
+xlabel ("Liczba wątków");
+ylabel ("Czas wykonania zadania [s]");
+title ("Czas wykonania średniego zadania");
+legend({'Średni problem', 'Idealny przebieg'},'Location','southwest')
+hold off
+
+bigProblemTime = Files_Big_M(1,2);
+for i = 1:length(Files_Big_M(:,1))
+    bigIdealYs(i) = bigProblemTime / Files_Big_M(i,1);
+end
+
+hf = figure ();
+hold on 
+scatter(threadsXs, bigTimeYs, 'filled') 
+scatter(threadsXs, bigIdealYs,50,'X', 'LineWidth',1);
+xlabel ("Liczba wątków");
+ylabel ("Czas wykonania zadania [s]");
+title ("Czas wykonania dużego zadania");
+legend({'Duży problem', 'Idealny przebieg'},'Location','southwest')
+hold off
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+idealSpeedupYs = 1:12;
+for i = 1:length(threadsXs)
+    smallSpeedupYs(i) = smallProblemTime / smallTimeYs(i);
+    medSpeedupYs(i) = medProblemTime / medTimeYs(i);
+    bigSpeedupYs(i) = bigProblemTime / bigTimeYs(i);
+end
+
+hf = figure ();
+hold on 
+scatter(threadsXs, smallSpeedupYs, 'filled') 
+scatter(threadsXs, medSpeedupYs, 'filled') 
+scatter(threadsXs, bigSpeedupYs, 'filled') 
+scatter(threadsXs, idealSpeedupYs,50,'X', 'LineWidth',1);
+xlabel ("Liczba wątków");
+ylabel ("Przyspieszenie");
+title ("Przyspieszenie w próbie małego zadania");
+legend({'Mały problem', 'Średni problem','Duzy problem', 'Idealny przebieg'},'Location','southwest')
+hold off
+
+for i = 1:length(threadsXs)
+    idealEffiYs(i) = 1;
+    smallEffiYs(i) = smallSpeedupYs(i) / threadsXs(i);
+    medEffiYs(i) = medSpeedupYs(i) / threadsXs(i);
+    bigEffiYs(i) = bigSpeedupYs(i) / threadsXs(i);
+end
+
+hf = figure ();
+hold on 
+scatter(threadsXs, smallEffiYs, 'filled') 
+scatter(threadsXs, medEffiYs, 'filled') 
+scatter(threadsXs, bigEffiYs, 'filled') 
+scatter(threadsXs, idealEffiYs,50,'X', 'LineWidth',1);
+xlabel ("Liczba wątków");
+ylabel ("Efektywność");
+title ("Efektywność w próbie małego zadania");
+legend({'Mały problem', 'Średni problem','Duzy problem','Idealny przebieg'},'Location','southwest')
+hold off
+
+for i = 1:length(threadsXs)
+    smallSerialFracXs(i) = (1/smallSpeedupYs(i) - 1 / threadsXs(i)) / (1 - 1 / threadsXs(i));
+    smallSerialFracXs(i) = (1/smallSpeedupYs(i) - 1 / threadsXs(i)) / (1 - 1 / threadsXs(i));
+    smallSerialFracXs(i) = (1/smallSpeedupYs(i) - 1 / threadsXs(i)) / (1 - 1 / threadsXs(i));
+end
+
+hf = figure ();
+hold on 
+scatter(threadsXs, smallSerialFracXs, 'filled') 
+%scatter(threadsXs, idealEffiYs,50,'X', 'LineWidth',1);
+xlabel ("Liczba wątków");
+ylabel ("Część sekwencyjna");
+title ("Zależność części sekwencyjnej od liczby procesorów w próbie małego zadania");
+legend({'Mały problem'},'Location','southwest')
+hold off
+
+
+% hf = figure ();
+% hold on 
+% scatter(Files_Med_M(:,1), Files_Med_M(:,2), 'filled') 
+% problemTime = Files_Med_M(1,2);
+% for i = 1:length(Files_Med_M(:,1))
+%     idealYs(i) = problemTime / Files_Med_M(i,1)
+% end
+% scatter(Files_Med_M(:,1), idealYs, '+')
+% xlabel ("Liczba wątków");
+% ylabel ("Czas wykonania zadania [s]");
+% title ("Czas wykonania średniego zadania");
+% legend({'Średni problem', 'Idealny przebieg'},'Location','southwest')
+% hold off
