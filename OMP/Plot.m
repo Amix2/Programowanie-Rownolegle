@@ -95,7 +95,7 @@ function ShowPlot(Data, Name)
     plot(Xs, Data(:,7));
     plot(Xs, Data(:,8));
     xlabel ("Liczba wątków");
-    ylabel ("Przyspieszenie [ms]");
+    ylabel ("Przyspieszenie");
     title ("Przyspieszenie - " +Name);
     legend({'static 1', 'static 1e4', 'dynamic 1', 'dynamic 1e4', 'guided 1', 'guided 1e4', 'static 0'},'Location','northwest')
     hold off
@@ -113,7 +113,7 @@ function ShowPlot(Data, Name)
     plot(Xs, Data(:,7));
     plot(Xs, Data(:,8));
     xlabel ("Liczba wątków");
-    ylabel ("Efektywność [%]");
+    ylabel ("Efektywność");
     title ("Efektywność - " +Name);
     legend({'static 1', 'static 1e4', 'dynamic 1', 'dynamic 1e4', 'guided 1', 'guided 1e4', 'static 0'},'Location','southwest')
     hold off
