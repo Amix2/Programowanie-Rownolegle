@@ -29,8 +29,8 @@ Med1 = {
 Med2 = {
     'Data/med2_0.txt'
     %'Data/med2_1.txt'
-    %'Data/med2_2.txt'
-    'Data/med2_3.txt'
+    'Data/med2_2.txt'
+    %'Data/med2_3.txt'
     'Data/med2_4.txt'
     'Data/med2_5.txt'
     'Data/med2_6.txt'
