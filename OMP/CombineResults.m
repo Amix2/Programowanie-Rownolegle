@@ -6,7 +6,7 @@ for fileID = 1:length(fileNames)
     fileData = readtable(file);
     data{fileID} = fileData;
 end
-dataHeight = 4;%height(data{1});
+dataHeight = height(data{1});
 dataWidth = width(data{1});
 
 if(debugPlot)

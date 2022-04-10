@@ -100,15 +100,18 @@ int main1(int argc, char* argv[])
 
 void CreateRandomData(double* Array, int size)
 {
-    unsigned short int x16v[3];
-#pragma omp parallel for private(x16v) schedule(runtime)
-    for (int s = 0; s < size; s++)
-    {
+    #pragma omp parallel
+    { 
+        unsigned short int x16v[3];
         int myThreadNum = omp_get_thread_num();
         x16v[0] = myThreadNum;
-        x16v[1] = s;
-        x16v[2] = myThreadNum + size;
-        Array[s] = double(erand48(x16v));
+        x16v[1] = myThreadNum >> 8;
+        x16v[2] = myThreadNum >> 16;
+        #pragma omp for schedule(runtime)
+        for (int s = 0; s < size; s++)
+        {
+            Array[s] = double(erand48(x16v));
+        }
     }
 }
 
@@ -329,7 +332,62 @@ int main2(int argc, char* argv[])
     return 0;
 }
 
+int main_TestRandBucket(int argc, char* argv[])
+{
+    bool DebugPrint = true;
+    int size = 1000000;
+    if (argc >= 2)
+    {
+        size = atoi(argv[1]);
+    }
+    int bucketCount = size;
+    int threadNum = 1;
+    omp_set_num_threads(threadNum);
+
+    double* Array = new double[size];
+    std::vector<double>** Buckets = new std::vector<double>*[threadNum];
+    for (int t = 0; t < threadNum; t++)
+    {
+        Buckets[t] = new std::vector<double>[bucketCount];
+        for (int b = 0; b < bucketCount; b++)
+            Buckets[t][b].reserve(8);
+    }
+    std::vector<double>* SingleBuckets = new std::vector<double>[bucketCount];
+    std::vector<int> bucketSizes(bucketCount);
+
+     // Create data
+    CreateRandomData(Array, size);
+
+    FillBuckets(size, Buckets, Array, bucketCount);
+
+    MergeBuckets(bucketCount, SingleBuckets, threadNum, Buckets);
+
+    std::vector<double>* Buc = SingleBuckets;
+    std::vector<int> counter;
+    counter.resize(12);
+    for(int i=0; i<bucketCount; i++)
+    {
+        int c = Buc[i].size();
+        if(c >= counter.size())
+            printf("ERRRRRRRRRRRRRRRR\n");
+        else
+            counter[c]++;
+    }
+    for(int i=0; i<counter.size(); i++)
+    {
+        printf("%d\t%d\n", i, counter[i]);
+    }
+    printf("=============\n");
+    for(int i=0; i<bucketCount; i++)
+    {
+       // printf("%d\t%d\n", i, Buc[i].size());
+    }
+
+    return 0;
+}
+
 int main(int argc, char* argv[])
 {
+    //return main_TestRandBucket(argc, argv);
     return main2(argc, argv);
 }
