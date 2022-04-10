@@ -158,44 +158,58 @@ int main1 (int argc, char * argv[])
     return 0;
 }
 
-double BucketSort(int threadNum, int size, int scheduleMode, int testSampleCount)
+double BucketSort(int threadNum, int size, int bucketCount, int scheduleMode, int testSampleCount)
 {
     bool DebugPrint = false;
     omp_set_num_threads(threadNum);
-    double* Array = (double*)malloc(sizeof(double) * size);
+    double* Array = new double[size];
     std::vector<double>** Buckets = new std::vector<double>*[threadNum];
-    std::vector<double>* SingleBuckets = new std::vector<double>[size];
-    for(int i=0; i<threadNum; i++)
+    for(int t=0; t<threadNum; t++)
     {
-        Buckets[i] = new std::vector<double>[size];
-        for(int j=0; j<size; j++)
-            Buckets[i][j].reserve(8);
+        Buckets[t] = new std::vector<double>[bucketCount];
+        for(int b=0; b<bucketCount; b++)
+            Buckets[t][b].reserve(8);
     }
-
+    std::vector<double>* SingleBuckets = new std::vector<double>[bucketCount];
+    std::vector<int> bucketSizes(bucketCount);
+    
     double timeStart = omp_get_wtime();
 
     // Create data
     unsigned short int x16v[3];
-    #pragma omp parallel for private(x16v, i) schedule(static)
-    for(int i=0; i<size; i++)
+    #pragma omp parallel for private(x16v) schedule(static)
+    for(int s=0; s<size; s++)
     {
-        Array[i] = erand48(x16v);
+        int myThreadNum = omp_get_thread_num();
+        x16v[0] = myThreadNum;
+        x16v[1] = s;
+        x16v[2] = myThreadNum + size;
+        Array[s] = double(erand48(x16v));
     }
 
     double t1 = omp_get_wtime();
     printf("rand: %lf\t", (t1 - timeStart));
-
+    // DEBUG print array
+    if(DebugPrint)
+    {
+        printf("DEBUG print array\n");
+        for(int j=0; j<size; j++)
+        {
+            printf("%lf, ", Array[j]);
+        }
+        printf("\n");
+    }
     // Put into buckets
-    #pragma omp parallel for private(threadNum) schedule(static)
-    for(i=0; i<size; i++)
+    #pragma omp parallel for schedule(static)
+    for(int s=0; s<size; s++)
     {
         int myThreadNum = omp_get_thread_num();
-       // int myMinId = int(float(myThreadNum) / threadNum * size);
-        //int myMaxId = int(float(myThreadNum+1) / threadNum * size);
+       // int myMinId = int(double(myThreadNum) / threadNum * size);
+        //int myMaxId = int(double(myThreadNum+1) / threadNum * size);
         std::vector<double>* myBucket = Buckets[myThreadNum];
 
-        double val = Array[i];
-        int valBucket = val * size;
+        double val = Array[s];
+        int valBucket = val * bucketCount;
         myBucket[valBucket].push_back(val);
     }
 
@@ -209,7 +223,7 @@ double BucketSort(int threadNum, int size, int scheduleMode, int testSampleCount
         for(int i=0; i<threadNum; i++)
         {
             printf("\n");
-            for(int j=0; j<size; j++)
+            for(int j=0; j<bucketCount; j++)
             {
                 for(int x=0; x<Buckets[i][j].size(); x++)
                     printf("%lf,", Buckets[i][j][x]);
@@ -219,14 +233,14 @@ double BucketSort(int threadNum, int size, int scheduleMode, int testSampleCount
         }
         printf("\n");
     }
-    // Merge buckets    TODO rowlonegle 
-    //#pragma omp parallel for private(threadNum) schedule(static)
-    for(i=0; i<size; i++)
+    // Merge buckets   
+    #pragma omp parallel for firstprivate(threadNum) schedule(static)
+    for(int b=0; b<bucketCount; b++)
     {
-        std::vector<double>* mySingleBucket = &SingleBuckets[i];
-        for(int j=0; j<threadNum; j++)
+        std::vector<double>* mySingleBucket = &SingleBuckets[b];
+        for(int t=0; t<threadNum; t++)
         {
-            std::vector<double>* mergeBucket = &Buckets[j][i];
+            std::vector<double>* mergeBucket = &Buckets[t][b];
             for(int x=0; x<mergeBucket->size(); x++)
             {
                 mySingleBucket->push_back(mergeBucket->at(x));
@@ -241,7 +255,7 @@ double BucketSort(int threadNum, int size, int scheduleMode, int testSampleCount
     if(DebugPrint)
     {
         printf("DEBUG single bucket\n");
-        for(int j=0; j<size; j++)
+        for(int j=0; j<bucketCount; j++)
         {
             for(int x=0; x<SingleBuckets[j].size(); x++)
             {
@@ -252,11 +266,12 @@ double BucketSort(int threadNum, int size, int scheduleMode, int testSampleCount
         printf("\n");
     }
 
-    #pragma omp parallel for private(threadNum) schedule(static)
-    for(i=0; i<size; i++)
+    #pragma omp parallel for schedule(static)
+    for(int b=0; b<bucketCount; b++)
     {
-        std::vector<double>* mySingleBucket = &SingleBuckets[i];
+        std::vector<double>* mySingleBucket = &SingleBuckets[b];
         std::sort(mySingleBucket->begin(), mySingleBucket->end());
+        bucketSizes[b] = mySingleBucket->size();
     }
 
     double t4 = omp_get_wtime();
@@ -266,7 +281,7 @@ double BucketSort(int threadNum, int size, int scheduleMode, int testSampleCount
     if(DebugPrint)
     {
         printf("DEBUG single bucket\n");
-        for(int j=0; j<size; j++)
+        for(int j=0; j<bucketCount; j++)
         {
             for(int x=0; x<SingleBuckets[j].size(); x++)
             {
@@ -276,18 +291,48 @@ double BucketSort(int threadNum, int size, int scheduleMode, int testSampleCount
         }
         printf("\n");
     }
+
+    for (int b = 1; b<bucketCount; b++) 
+        bucketSizes[b] += bucketSizes[b-1];
+
+    #pragma omp parallel for schedule(static)
+    for(int b=0; b<bucketCount; b++)
+    {
+        int insertId = b == 0 ? 0 : bucketSizes[b-1];
+        for (int i = 0; i < SingleBuckets[b].size(); i++)
+        {
+            Array[insertId + i] = SingleBuckets[b][i];
+        }
+    }
+
     double timeEnd = omp_get_wtime();
+    printf("finalize : %lf\t", (timeEnd - t4));
+
+    // DEBUG print sorted array
+    if(DebugPrint)
+    {
+        printf("DEBUG print sorted array\n");
+        for(int j=0; j<size; j++)
+        {
+            printf("%lf, ", Array[j]);
+        }
+        printf("\n");
+    }
  
-    //free(Array);
-    //delete Buckets; // TODO better delete 
-   // delete SingleBuckets;
+    delete[] Array;
+    delete[] SingleBuckets;
+    for(int i=0; i<threadNum; i++)
+    {
+        delete[] Buckets[i];
+    }
+    delete[] Buckets;
     return (timeEnd - timeStart);
 }
 
 int main2 (int argc, char * argv[])
 {
     int setThreadNum = 4;
-    int size = 100000;
+    int size = 1000000;
     if(argc>=2)
     {
         size = atoi(argv[1]);
@@ -308,7 +353,7 @@ int main2 (int argc, char * argv[])
         int schMode=0;
         for(schMode=0; schMode<=0; schMode++)
         {
-            double time = BucketSort(thCount, size, schMode, testSampleCount)*1000;
+            double time = BucketSort(thCount, size, size, schMode, testSampleCount)*1000;
             //printf("%lf\t",time/testSampleCount);
         }
         printf("\n");
@@ -318,6 +363,5 @@ int main2 (int argc, char * argv[])
 
 int main (int argc, char * argv[])
 {
-
     return main2(argc, argv);
 }
