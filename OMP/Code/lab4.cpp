@@ -53,7 +53,7 @@ double TestTimeGoodRand(int threadNum, int size, int scheduleMode, int testSampl
         while (testSampleCount)
         {
             testSampleCount--;
-#pragma omp parallel for private(i, x16v) schedule(static)
+#pragma omp parallel for private(i, x16v) schedule(runtime)
             for (i = 0; i < size; i++)
             {
                 Array[i] = erand48(x16v);
@@ -101,7 +101,7 @@ int main1(int argc, char* argv[])
 void CreateRandomData(double* Array, int size)
 {
     unsigned short int x16v[3];
-#pragma omp parallel for private(x16v) schedule(static)
+#pragma omp parallel for private(x16v) schedule(runtime)
     for (int s = 0; s < size; s++)
     {
         int myThreadNum = omp_get_thread_num();
@@ -114,7 +114,7 @@ void CreateRandomData(double* Array, int size)
 
 void FillBuckets(int size, std::vector<double>** Buckets, double* Array, int bucketCount)
 {
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(runtime)
     for (int s = 0; s < size; s++)
     {
         int myThreadNum = omp_get_thread_num();
@@ -129,7 +129,7 @@ void FillBuckets(int size, std::vector<double>** Buckets, double* Array, int buc
 void MergeBuckets(int bucketCount, std::vector<double>* SingleBuckets, int threadNum, std::vector<double>** Buckets)
 {
     // Merge buckets   
-#pragma omp parallel for firstprivate(threadNum) schedule(static)
+#pragma omp parallel for firstprivate(threadNum) schedule(runtime)
     for (int b = 0; b < bucketCount; b++)
     {
         std::vector<double>* mySingleBucket = &SingleBuckets[b];
@@ -146,7 +146,7 @@ void MergeBuckets(int bucketCount, std::vector<double>* SingleBuckets, int threa
 
 void SortSingleBucket(int bucketCount, std::vector<double>* SingleBuckets, std::vector<int>& bucketSizes)
 {
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(runtime)
     for (int b = 0; b < bucketCount; b++)
     {
         std::vector<double>* mySingleBucket = &SingleBuckets[b];
@@ -160,7 +160,7 @@ void ExportToSortedArray(int bucketCount, std::vector<int>& bucketSizes, std::ve
     for (int b = 1; b < bucketCount; b++)
         bucketSizes[b] += bucketSizes[b - 1];
 
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(runtime)
     for (int b = 0; b < bucketCount; b++)
     {
         int insertId = b == 0 ? 0 : bucketSizes[b - 1];
