@@ -3,7 +3,7 @@ data = {};
 for fileID = 1:length(fileNames)
     fileArr = fileNames(fileID);
     file = fileArr{1,1};
-    fileData = readtable(file);
+    fileData = readtable(strtrim(file));
     data{fileID} = fileData;
 end
 dataHeight = height(data{1});
