@@ -1,0 +1,11 @@
+Data_Seq2/1e6_0.txt
+Data_Seq2/1e6_1.txt
+Data_Seq2/1e6_2.txt
+Data_Seq2/1e6_3.txt
+Data_Seq2/1e6_4.txt
+Data_Seq2/1e6_5.txt
+Data_Seq2/1e6_6.txt
+Data_Seq2/1e6_7.txt
+Data_Seq2/1e6_8.txt
+Data_Seq2/1e6_9.txt
+Data_Seq2/1e6_10.txt

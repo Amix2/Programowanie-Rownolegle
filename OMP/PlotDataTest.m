@@ -1,10 +1,11 @@
 Files = {
-    'Data2/dataTest.txt'
+    'outrand.txt'
 };
 
 Data = CombineResults(Files, false);
 
-scatter(Data(:,1), Data(:,2), '.')
-xlabel ("Indeks kubełka");
-ylabel ("Rozmiar kubełka");
-title ("Rozkład roamizru kubełków");
+plot(Data(:,1), Data(:,2))
+xlabel ("Rozmiar kubełka");
+ylabel ("Liczba wystąpień");
+title ("Rozkład rozmiaru kubełków");
+disp(sum(Data(:,2)./1000))
