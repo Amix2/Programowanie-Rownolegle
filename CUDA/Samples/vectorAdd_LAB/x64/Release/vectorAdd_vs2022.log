@@ -1,0 +1,11 @@
+﻿D:\Programs\Visual Studio\2022 Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(500,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
+  Compiling CUDA source file vectorAdd.cu...
+  
+  D:\AGH\MPR\CUDA\Samples\vectorAdd_LAB>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\bin\nvcc.exe" -gencode=arch=compute_35,code=\"sm_35,compute_35\" -gencode=arch=compute_37,code=\"sm_37,compute_37\" -gencode=arch=compute_50,code=\"sm_50,compute_50\" -gencode=arch=compute_52,code=\"sm_52,compute_52\" -gencode=arch=compute_60,code=\"sm_60,compute_60\" -gencode=arch=compute_61,code=\"sm_61,compute_61\" -gencode=arch=compute_70,code=\"sm_70,compute_70\" -gencode=arch=compute_75,code=\"sm_75,compute_75\" -gencode=arch=compute_80,code=\"sm_80,compute_80\" -gencode=arch=compute_86,code=\"sm_86,compute_86\" --use-local-env -ccbin "D:\Programs\Visual Studio\2022 Community\VC\Tools\MSVC\14.32.31326\bin\HostX64\x64" -x cu   -I./ -I../../../Common -I./ -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\/include" -I../../../Common -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6\include"     --keep-dir x64\Release  -maxrregcount=0  --machine 64 --compile -cudart static -Xcompiler "/wd 4819"  --threads 0   -DWIN32 -DWIN32 -D_MBCS -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /Fdx64/Release/vc143.pdb /FS   /MT " -o D:\AGH\MPR\CUDA\Samples\vectorAdd_LAB\x64\Release\vectorAdd.cu.obj "D:\AGH\MPR\CUDA\Samples\vectorAdd_LAB\vectorAdd.cu" 
+CUDACOMPILE : nvcc warning : The 'compute_35', 'compute_37', 'sm_35', and 'sm_37' architectures are deprecated, and may be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+  vectorAdd.cu
+  tmpxft_00000dc4_00000000-7_vectorAdd.compute_86.cudafe1.cpp
+D:\AGH\MPR\CUDA\Samples\vectorAdd_LAB\vectorAdd.cu(175): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
+     Creating library .\Output\vectorAdd.lib and object .\Output\vectorAdd.exp
+  LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+  vectorAdd_vs2022.vcxproj -> D:\AGH\MPR\CUDA\Samples\vectorAdd_LAB\Output\vectorAdd.exe
