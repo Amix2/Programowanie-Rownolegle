@@ -1,2 +1,7 @@
 
 CUDA/.vs/
+CUDA/Code/.vs/
+CUDA/Code/.vscode/
+CUDA/Code/x64/
+CUDA/Samples/vectorAdd_LAB/.vs/
+CUDA/Samples/vectorAdd_LAB/vectorAdd_vs2022.VC.db
