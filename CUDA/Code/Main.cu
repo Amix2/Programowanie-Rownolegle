@@ -11,7 +11,7 @@
 
 int main(int argc, char* argv[])
 {
-	int mode = 2;
+	int mode = 4;
 	if (argc >= 2)
 		mode = atoi(argv[1]);
 	switch (mode)
@@ -21,6 +21,12 @@ int main(int argc, char* argv[])
 		break;
 	case 2:
 		mainImageScailing(argc-1, argv+1);
+		break;
+	case 3:
+		mainReductionGlobal(argc - 1, argv + 1);
+		break;
+	case 4:
+		mainWarmDivergence(argc - 1, argv + 1);
 		break;
 	}
 	//mainVectorAdd(argc, argv);

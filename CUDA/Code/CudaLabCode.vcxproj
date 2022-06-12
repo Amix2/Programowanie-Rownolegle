@@ -98,17 +98,25 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="1_reduction_global_kernel.cu" />
+    <CudaCompile Include="1_reduction_shared_kernel.cu" />
+    <CudaCompile Include="2_reduction_kernel_interleaving.cu" />
+    <CudaCompile Include="2_reduction_kernel_sequential.cu" />
     <CudaCompile Include="image_scaling.cu" />
     <CudaCompile Include="matrix_transpose.cu" />
     <CudaCompile Include="matrix_transpose_2.cu" />
     <CudaCompile Include="vectorAdd.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="1_reduction.h" />
+    <ClInclude Include="2_reduction.h" />
     <ClInclude Include="cudaHeader.cuh" />
     <ClInclude Include="gputimer.h" />
     <ClInclude Include="scrImagePgmPpmPackage.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="1_reduction.cpp" />
+    <ClCompile Include="2_reduction.cpp" />
     <ClCompile Include="Main.cu" />
     <ClCompile Include="scrImagePgmPpmPackage.cpp" />
   </ItemGroup>
